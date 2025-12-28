@@ -94,7 +94,8 @@ impl Complex64 {
     pub fn log(self) -> Self {
         Self { re: self.re.hypot(self.im).ln(), im: self.im.atan2(self.re) }
     }
-    
+
+
     /// A real part of `self` 
     #[inline]
     pub fn real(self) -> f64 {
@@ -416,6 +417,18 @@ mod tests {
         let reference = tmp + a;
 
         assert!(fma_result == reference);
+    }
+
+    #[test]
+    fn conj() {
+       let a = Complex64::new(2.0, 5.0);
+       assert!(a.conj() == Complex64::new(2.0, -5.0))
+    }
+
+    #[test]
+    fn i_unit() {
+        let a = Complex64::i();
+        assert!(a == Complex64::new(0.0, 1.0))
     }
 
     #[test]
