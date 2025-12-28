@@ -213,6 +213,7 @@ impl Div for Complex64 {
     }
 }
 
+// c64 / f64
 impl Div<f64> for Complex64 {
     type Output = Self;
 
