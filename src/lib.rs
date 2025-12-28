@@ -14,7 +14,7 @@ const ATOL: f64 = 1e-12;
 const RTOL: f64 = 1e-9;
 
 #[inline]
-pub fn is_zero(x: f64) -> bool {
+fn is_zero(x: f64) -> bool {
     x.abs() <= ATOL
 }
 
@@ -104,8 +104,8 @@ impl Complex64 {
 
 /// Comparison operators: == and !=
 impl PartialEq for Complex64 {
-    fn eq(&self, other: &Self) -> bool {
-        is_equal(self.re, other.re) && is_equal(self.im, other.im)
+    fn eq(&self, rhs: &Self) -> bool {
+        is_equal(self.re, rhs.re) && is_equal(self.im, rhs.im)
     }
 }
 
@@ -149,16 +149,17 @@ impl Mul for Complex64 {
     }
 }
 
-// Allows for c64 * f64
+// c64 * f64
 impl Mul<f64> for Complex64 {
     type Output = Self;
 
-    #[inline]
+    #[inline(always)]
     fn mul(self, rhs: f64) -> Self::Output {
         Self::new(self.re * rhs, self.im * rhs)
     }
 }
 
+// f64 * f64 + f64 fused
 impl MulAdd for f64 {
     type Output = f64;
 
@@ -171,12 +172,12 @@ impl MulAdd for f64 {
 // (a + i b) * (c + i d) + (e + i f) == ((a*c + e) - b*d) + i (a*d + (b*c + f))
 impl MulAdd for Complex64 {
     type Output = Self;
-
+    
+    /// Fused multiply add: `self` + `rhs` + `acc`
     #[inline]
     fn fma(self, rhs: Self, acc: Self) -> Self::Output {
-        // TODO: partially fused semantics
-        let re: f64 = self.re.mul_add(rhs.re, acc.re) - (self.im * rhs.im);
-        let im: f64 = self.im.mul_add(rhs.re, acc.im) + (self.re * rhs.im);
+        let re: f64 = self.im.mul_add(-rhs.im, self.re.mul_add(rhs.re, acc.re));
+        let im: f64 = self.re.mul_add(rhs.im, self.im.mul_add(rhs.re, acc.im));
         Self::new(re, im)
     }
 }
@@ -294,35 +295,35 @@ mod tests {
     }
 
     #[test]
-    fn partial_eq_op() {
+    fn partial_eq() {
         let a = Complex64::new(-4.3, 6.7);
         let b = Complex64::new(-4.3, 6.7);
         assert!(a == b)
     }
 
     #[test]
-    fn addition() {
+    fn add() {
         let a = Complex64::new(3.0, 4.0);
         let b = Complex64::new(7.0, 3.0);
         assert_eq!(a + b, Complex64::new(10.0, 7.0))
     }
 
     #[test]
-    fn subtraction() {
+    fn sub() {
         let a = Complex64::new(6.0, 4.0);
         let b = Complex64::new(2.0, 1.0);
         assert_eq!(a - b, Complex64::new(4.0, 3.0))
     }
 
     #[test]
-    fn multiplication() {
+    fn mult() {
         let a = Complex64::new(3.0, 8.5);
         let b = Complex64::new(4.1, 2.2);
         assert_eq!(a * b, Complex64::new(-6.4, 41.45))
     }
 
     #[test]
-    fn division() {
+    fn div() {
         let a = Complex64::new(38.2, 49.5);
         let b = Complex64::new(12.4, 10.0);
         assert!(a / b == Complex64::new(3.81730769, 0.913461538))
@@ -362,5 +363,33 @@ mod tests {
         a /= b;
         println!("{}, {}", a.re, a.im);
         assert!(a == Complex64::new(3.52941176470, 4.1176470588));
+    }
+
+    #[test]
+    fn fma() {
+        let z = Complex64::new(1.75, -2.25);
+        let w = Complex64::new(-0.5, 3.125);
+        let a = Complex64::new(4.0, -1.5);
+
+        let fma_result = z.fma(w, a);
+       
+        let tmp = z * w;
+        let reference = tmp + a;
+
+        assert!(fma_result == reference);
+    }
+
+    #[test]
+    fn fma_rounding_sensitive() {
+        let z = Complex64::new(1.0e16, 1.0);
+        let w = Complex64::new(1.0e-16, -1.0);
+        let a = Complex64::new(1.0, -1.0);
+
+        let fma_result = z.fma(w, a);
+        
+        let tmp = z * w; 
+        let reference = tmp + a;
+
+        assert!(fma_result == reference);
     }
 }
