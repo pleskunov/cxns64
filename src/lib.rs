@@ -70,6 +70,20 @@ impl Complex64 {
         self.im.atan2(self.re)
     }
 
+    /// e^(self)
+    /// e ^ (a + i b) = e^a * (cos(b) + i sin(b)) 
+    #[inline]
+    pub fn exp(self) -> Self {
+        let ex = self.re.exp();
+        Self { re: ex * self.im.cos(), im: ex * self.im.sin() }
+    }
+
+    /// TODO: check
+    #[inline]
+    pub fn log(self) -> Self {
+        Self { re: self.re.hypot(self.im).ln(), im: self.im.atan2(self.re) }
+    }
+    
     /// A real part of self 
     #[inline]
     pub fn real(self) -> f64 {
@@ -80,6 +94,13 @@ impl Complex64 {
     #[inline]
     pub fn imag(self) -> f64 {
         self.im
+    }
+}
+
+
+impl PartialEq for Complex64 {
+    fn eq(&self, other: &Self) -> bool {
+        is_equal(self.re, other.re) && is_equal(self.im, other.im)
     }
 }
 
@@ -254,12 +275,6 @@ impl DivAssign for Complex64 {
     }
 }
 
-impl PartialEq for Complex64 {
-    fn eq(&self, other: &Self) -> bool {
-        is_equal(self.re, other.re) && is_equal(self.im, other.im)
-    }
-}
-
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right
@@ -270,8 +285,44 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    fn constructor() {
+        let z = Complex64::new(2.0, 5.0);
+        assert_eq!(z.re, 2.0);
+        assert_eq!(z.im, 5.0);
+    }
+
+    #[test]
+    fn partial_eq_op() {
+        let a = Complex64::new(-4.3, 6.7);
+        let b = Complex64::new(-4.3, 6.7);
+        assert!(a == b)
+    }
+
+    #[test]
+    fn addition() {
+        let a = Complex64::new(3.0, 4.0);
+        let b = Complex64::new(7.0, 3.0);
+        assert_eq!(a + b, Complex64::new(10.0, 7.0))
+    }
+
+    #[test]
+    fn subtraction() {
+        let a = Complex64::new(6.0, 4.0);
+        let b = Complex64::new(2.0, 1.0);
+        assert_eq!(a - b, Complex64::new(4.0, 3.0))
+    }
+
+    #[test]
+    fn multiplication() {
+        let a = Complex64::new(3.0, 8.5);
+        let b = Complex64::new(4.1, 2.2);
+        assert_eq!(a * b, Complex64::new(-6.4, 41.45))
+    }
+
+    #[test]
+    fn division() {
+        let a = Complex64::new(38.2, 49.5);
+        let b = Complex64::new(12.4, 10.0);
+        assert!(a / b == Complex64::new(3.81730769, 0.913461538))
     }
 }
