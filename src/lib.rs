@@ -30,7 +30,6 @@ fn is_less(x: f64, y: f64) -> bool {
     x < y && !is_equal(x, y)
 }
 
-
 /// A 64-bit floating-point complex number in Cartesian form
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
@@ -58,15 +57,52 @@ impl Complex64 {
        Self { re: self.re, im: -self.im } 
     }
 
-    /// An Euclidian norm of self (the same as abs()) 
+    /// An absolute value of `self`
     #[inline]
-    pub fn norm(self) -> f64 {
-        self.re.hypot(self.im)
+    pub fn abs(self) -> f64 {
+        self.re.hypot(self.im)   
     }
 
-    /// An absolute value of self (the same as norm())
-    pub fn abs(self) -> f64 {
-        self.norm()
+    /// Check if `self` is effectively zero
+    #[inline]
+    pub fn is_zero(self) -> bool {
+        is_zero(self.re) && is_zero(self.im)
+    }
+
+    /// A square root of `self`
+    #[inline]
+    pub fn sqrt(self) -> Self {
+        
+        let re0: f64 = self.re;
+        let im0: f64 = self.im;
+
+        if re0 == 0.0 && im0 == 0.0 {
+            return Self::new(0.0, 0.0)
+        }
+
+        let x: f64 = re0.abs();
+        let y: f64 = im0.abs();
+
+        let w: f64 = match x >= y {
+            true => {  
+                let r: f64 = y / x;
+                x.sqrt() * (0.5 * (1.0 + (1.0 + r * r).sqrt())).sqrt()
+            },
+            false => {
+                let r: f64 = x / y;
+                y.sqrt() * (0.5 * (r + (1.0 + r * r).sqrt())).sqrt()
+            },
+        };
+
+        let (re, im) = match re0 >= 0.0 {
+            true => (w, im0 / (2.0 * w)),
+            false => { 
+                let im = match im0 >= 0.0 { true => w, false => -w, };
+                (im0 / (2.0 * im), im) 
+            }
+        };
+
+        Self::new(re, im)
     }
 
     /// A square of Euclidian norm of self
@@ -388,7 +424,7 @@ mod tests {
         let b = Complex64::new(1.25, -0.75);
         a /= b;
         println!("{}, {}", a.re, a.im);
-        assert!(a == Complex64::new(3.52941176470, 4.1176470588));
+        assert!(a == Complex64::new(3.5294117647, 4.1176470588));
     }
 
     #[test]
@@ -420,9 +456,57 @@ mod tests {
     }
 
     #[test]
+    fn abs() {
+        let a = Complex64::new(4.23, 2.28);
+        assert!(is_equal(a.abs(), 4.80534077876))
+    }
+
+    #[test]
     fn conj() {
        let a = Complex64::new(2.0, 5.0);
        assert!(a.conj() == Complex64::new(2.0, -5.0))
+    }
+
+    #[test]
+    fn sqrt() {
+        let a = Complex64::new(3.0, 4.0);
+        let w = a.sqrt();
+        assert!(w == Complex64::new(2.0, 1.0))
+    }
+
+    #[test]
+    fn sqrt_negative_real_axis() {
+        let a = Complex64::new(-4.0, 0.0);
+
+        let w = a.sqrt();
+
+        // principal square root: 0 + 2i
+        let expected = Complex64::new(0.0, 2.0);
+
+        assert!(w == expected);
+    }
+
+    #[test]
+    fn sqrt_large_magnitude() {
+        let a = Complex64::new(1.0e300, 1.0);
+
+        let w = a.sqrt();
+
+        // Property-based check:
+        // sqrt(a) * sqrt(a) ≈ z
+        let reconstructed = w * w;
+
+        assert!(reconstructed == a);
+    }
+
+    #[test]
+    fn sqrt_near_branch_cut() {
+        let a = Complex64::new(-1.0, 1.0e-14);
+
+        let w = a.sqrt();
+        let reconstructed = w * w;
+
+        assert!(reconstructed == a);
     }
 
     #[test]
