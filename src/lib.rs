@@ -419,6 +419,18 @@ mod tests {
     }
 
     #[test]
+    fn real() {
+        let a = Complex64::new(1.0, 2.0);
+        assert_eq!(a.real(), 1.0);
+    }
+
+    #[test]
+    fn imag() {
+        let a = Complex64::new(1.0, 2.0);
+        assert_eq!(a.imag(), 2.0);
+    }
+
+    #[test]
     fn is_nan() {
         let a = Complex64::new(f64::NAN, 5.0);
         let b = Complex64::new(1.0, f64::NAN);
