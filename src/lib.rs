@@ -39,19 +39,19 @@ pub struct Complex64 {
 }
 
 impl Complex64 { 
-    /// Create a new complex number
+    /// Constructor
     #[inline]
     pub fn new(re: f64, im: f64) -> Self {
         Self { re, im }
     }
 
-    /// Create an imaginary unit
+    /// Constructor for an imaginary unit
     #[inline]
     pub fn i() -> Self {
         Self::new(0.0, 1.0)
     }
 
-    /// A complex conjugate of self
+    /// A complex conjugate of `self`
     #[inline]
     pub fn conj(self) -> Self {
        Self { re: self.re, im: -self.im } 
@@ -69,7 +69,7 @@ impl Complex64 {
         is_zero(self.re) && is_zero(self.im)
     }
 
-    /// A square root of `self`
+    /// A principal square root of `self`
     #[inline]
     pub fn sqrt(self) -> Self {
         
@@ -105,33 +105,6 @@ impl Complex64 {
         Self::new(re, im)
     }
 
-    /// A square of Euclidian norm of self
-    #[inline]
-    pub fn norm_sqr(self) -> f64 {
-        self.re * self.re + self.im * self.im
-    }
-
-    /// A principal Arg of self
-    #[inline]
-    pub fn arg(self) -> f64 {
-        self.im.atan2(self.re)
-    }
-
-    /// e^(self)
-    /// e ^ (a + i b) = e^a * (cos(b) + i sin(b)) 
-    #[inline]
-    pub fn exp(self) -> Self {
-        let ex = self.re.exp();
-        Self { re: ex * self.im.cos(), im: ex * self.im.sin() }
-    }
-
-    /// TODO: check
-    #[inline]
-    pub fn log(self) -> Self {
-        Self { re: self.re.hypot(self.im).ln(), im: self.im.atan2(self.re) }
-    }
-
-
     /// A real part of `self` 
     #[inline]
     pub fn real(self) -> f64 {
@@ -144,19 +117,19 @@ impl Complex64 {
         self.im
     }
 
-    /// Check if the complex number is NaN
+    /// Check if `self` is NaN
     #[inline]
     pub fn is_nan(self) -> bool {
         self.re.is_nan() || self.im.is_nan()
     }
     
-    /// Check if the complex number is infinite
+    /// Check if `self` is infinite
     #[inline]
     pub fn is_infinite(self) -> bool {
         !self.is_nan() && (self.re.is_infinite() || self.im.is_infinite())
     }
 
-    /// Check if the complex numer is finite
+    /// Check if `self` is finite
     #[inline]
     pub fn is_finite(self) -> bool {
         self.re.is_finite() && self.im.is_finite()
@@ -417,7 +390,6 @@ mod tests {
         assert!(a == Complex64::new(12.5, 9.0));
     }
 
-
     #[test]
     fn div_assign() {
         let mut a = Complex64::new(7.5, 2.5);
@@ -453,6 +425,20 @@ mod tests {
         let reference = tmp + a;
 
         assert!(fma_result == reference);
+    }
+
+    #[test]
+    fn mul_by_scalar() {
+        let a = Complex64::new(2.0, 2.0);
+        let b = a * 2.0;
+        assert!(b == Complex64::new(4.0, 4.0));
+    }
+
+    #[test]
+    fn div_by_scalar() {
+        let a = Complex64::new(2.0, 2.0);
+        let b = a / 2.0;
+        assert!(b == Complex64::new(1.0, 1.0));
     }
 
     #[test]
