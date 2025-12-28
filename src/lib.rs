@@ -45,7 +45,13 @@ impl Complex64 {
     pub fn new(re: f64, im: f64) -> Self {
         Self { re, im }
     }
-    
+
+    /// Create an imaginary unit
+    #[inline]
+    pub fn i() -> Self {
+        Self::new(0.0, 1.0)
+    }
+
     /// A complex conjugate of self
     #[inline]
     pub fn conj(self) -> Self {
@@ -89,16 +95,34 @@ impl Complex64 {
         Self { re: self.re.hypot(self.im).ln(), im: self.im.atan2(self.re) }
     }
     
-    /// A real part of self 
+    /// A real part of `self` 
     #[inline]
     pub fn real(self) -> f64 {
         self.re
     }
 
-    /// An imaginary part of self
+    /// An imaginary part of `self`
     #[inline]
     pub fn imag(self) -> f64 {
         self.im
+    }
+
+    /// Check if the complex number is NaN
+    #[inline]
+    pub fn is_nan(self) -> bool {
+        self.re.is_nan() || self.im.is_nan()
+    }
+    
+    /// Check if the complex number is infinite
+    #[inline]
+    pub fn is_infinite(self) -> bool {
+        !self.is_nan() && (self.re.is_infinite() || self.im.is_infinite())
+    }
+
+    /// Check if the complex numer is finite
+    #[inline]
+    pub fn is_finite(self) -> bool {
+        self.re.is_finite() && self.im.is_finite()
     }
 }
 
@@ -392,5 +416,26 @@ mod tests {
         let reference = tmp + a;
 
         assert!(fma_result == reference);
+    }
+
+    #[test]
+    fn is_nan() {
+        let a = Complex64::new(f64::NAN, 5.0);
+        let b = Complex64::new(1.0, f64::NAN);
+        assert!(a.is_nan() && b.is_nan())
+    }
+
+    #[test]
+    fn is_infinite() {
+        let a = Complex64::new(f64::INFINITY, 5.0);
+        let b = Complex64::new(1.0, f64::INFINITY);
+        assert!(a.is_infinite() && b.is_infinite())
+    }
+
+    #[test]
+    fn is_finite() {
+        let a = Complex64::new(f64::INFINITY, 5.0);
+        let b = Complex64::new(1.0, 2.0);
+        assert!(!a.is_finite() && b.is_finite())
     }
 }
