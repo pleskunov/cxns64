@@ -4,6 +4,10 @@
 //! 64-bit floating-point complex numbers. It implements all basic 
 //! operations such as addition, subtraction, multiplication and
 //! division.
+//!
+//! ## Compatibility
+//!
+//! The `sxns64` crate is tested for rustc 1.92 and greater.
 
 const ATOL: f64 = 1e-12;
 const RTOL: f64 = 1e-9;
@@ -97,14 +101,14 @@ impl Complex64 {
     }
 }
 
-
+/// Comparison operators: == and !=
 impl PartialEq for Complex64 {
     fn eq(&self, other: &Self) -> bool {
         is_equal(self.re, other.re) && is_equal(self.im, other.im)
     }
 }
 
-
+/// Addition, subtraction, multiplication and division operators
 use core::ops::{Add, Sub, Mul, Div};
 
 pub trait MulAdd<Rhs = Self, Acc = Self> {
@@ -216,8 +220,8 @@ impl Div<f64> for Complex64 {
     }
 }
 
-
-use core::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+/// Addition, subtraction, multiplication and division assignment operators
+use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign};
 
 impl AddAssign for Complex64 {
     fn add_assign(&mut self, rhs: Self) {
@@ -275,10 +279,7 @@ impl DivAssign for Complex64 {
     }
 }
 
-
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+/// Tests
 
 #[cfg(test)]
 mod tests {
@@ -324,5 +325,41 @@ mod tests {
         let a = Complex64::new(38.2, 49.5);
         let b = Complex64::new(12.4, 10.0);
         assert!(a / b == Complex64::new(3.81730769, 0.913461538))
+    }
+
+    #[test]
+    fn add_assign() {
+        let mut a = Complex64::new(1.25, -3.5);
+        let b = Complex64::new(-2.75, 4.125);
+        a += b;
+        assert!(a == Complex64::new(-1.5, 0.625));
+    }
+
+    
+    #[test]
+    fn sub_assign() {
+        let mut a = Complex64::new(5.75, 2.0);
+        let b = Complex64::new(1.25, -3.5);
+        a -= b;
+        assert!(a == Complex64::new(4.5, 5.5));
+    }
+
+
+    #[test]
+    fn mul_assign() {
+        let mut a = Complex64::new(2.0, 3.0);
+        let b = Complex64::new(4.0, -1.5);
+        a *= b;
+        assert!(a == Complex64::new(12.5, 9.0));
+    }
+
+
+    #[test]
+    fn div_assign() {
+        let mut a = Complex64::new(7.5, 2.5);
+        let b = Complex64::new(1.25, -0.75);
+        a /= b;
+        println!("{}, {}", a.re, a.im);
+        assert!(a == Complex64::new(3.52941176470, 4.1176470588));
     }
 }

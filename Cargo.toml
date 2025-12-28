@@ -1,6 +1,15 @@
 [package]
 name = "cxns64"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2024"
+authors = ["Pavel Pleskunov"]
+description = "Implementation of 64-bit complex numbers with floating point for Rust"
+homepage = "https://github.com/pleskunov/cxns64"
+keywords = ["mathematics", "numerics"]
+categories = ["algorithms", "science"]
+repository = "https://github.com/pleskunov/cxns64"
+readme = "README.md"
+exclude = ["/ci/*", "/.github/*"]
+rust-version = "1.92"
 
 [dependencies]
