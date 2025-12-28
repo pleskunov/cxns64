@@ -1,13 +1,14 @@
 //! # `cxns64`
 //!
-//! ComplexNumbers is a simple library that implements support for
-//! 64-bit floating-point complex numbers. It implements all basic 
-//! operations such as addition, subtraction, multiplication and
-//! division.
+//! A lightweight Rust library providing a fixed-precision (`f64`) complex number
+//! type with basic arithmetic operations.
+//!
+//! The crate implements addition, subtraction, multiplication, division,
+//! and selected elementary functions for complex numbers.
 //!
 //! ## Compatibility
 //!
-//! The `sxns64` crate is tested for rustc 1.92 and greater.
+//! The `cxns64` crate is tested with rustc 1.92 and newer.
 
 const ATOL: f64 = 1e-12;
 const RTOL: f64 = 1e-9;
