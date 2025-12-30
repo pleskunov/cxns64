@@ -533,4 +533,19 @@ mod tests {
         let b = Complex64::new(1.0, 2.0);
         assert!(!a.is_finite() && b.is_finite())
     }
+
+    #[test]
+    fn vec_of_complex64_constructor() {
+        let mut v: Vec<Complex64> = Vec::new();
+        v.reserve(3);
+
+        v.push(Complex64::new(1.0, 2.0));
+        v.push(Complex64::new(3.0, 4.0));
+        v.push(Complex64::new(5.0, 6.0));
+       
+        assert_eq!(v.len(), 3);
+        assert!(is_equal(v[0].re, 1.0));
+        assert!(is_equal(v[1].re, 3.0));
+        assert!(is_equal(v[2].im, 6.0));
+    }
 }
