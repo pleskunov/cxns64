@@ -144,7 +144,7 @@ impl PartialEq for Complex64 {
 }
 
 /// Addition, subtraction, multiplication and division operators
-use core::ops::{Add, Sub, Mul, Div};
+use core::ops::{Add, Sub, Mul, Div, Neg};
 
 pub trait MulAdd<Rhs = Self, Acc = Self> {
     type Output;
@@ -189,7 +189,7 @@ impl Mul<f64> for Complex64 {
 
     #[inline(always)]
     fn mul(self, rhs: f64) -> Self::Output {
-        Self::new(self.re * rhs, self.im * rhs)
+        Self::Output::new(self.re * rhs, self.im * rhs)
     }
 }
 
@@ -244,6 +244,16 @@ impl Div for Complex64 {
         }
 
         Self::Output::new(re, im)
+    }
+}
+
+// c64 = -c64
+impl Neg for Complex64 {
+    type Output = Self;
+    
+    #[inline]
+    fn neg(self) -> Self::Output {
+        Self::Output::new(-self.re, -self.im)
     }
 }
 
@@ -547,5 +557,15 @@ mod tests {
         assert!(is_equal(v[0].re, 1.0));
         assert!(is_equal(v[1].re, 3.0));
         assert!(is_equal(v[2].im, 6.0));
+    }
+
+    #[test]
+    fn negation() {
+        let mut c = Complex64::new(2.0, 4.0);
+        
+        c = -c;
+
+        assert!(is_equal(c.re, -2.0));
+        assert!(is_equal(c.im, -4.0));
     }
 }
