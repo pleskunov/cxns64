@@ -105,6 +105,26 @@ impl Complex64 {
         Self::new(re, im)
     }
 
+    /// The sine of `self`.
+    #[inline]
+    pub fn sin(self) -> Self {
+        // formula: sin(a + bi) = sin(a)cosh(b) + i*cos(a)sinh(b)
+        Self::new(
+            self.re.sin() * self.im.cosh(),
+            self.re.cos() * self.im.sinh(),
+        )
+    }
+
+    /// The cosine of `self`.
+    #[inline]
+    pub fn cos(self) -> Self {
+        // formula: cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)
+        Self::new(
+            self.re.cos() * self.im.cosh(),
+            -self.re.sin() * self.im.sinh(),
+        )
+    }
+
     /// A real part of `self` 
     #[inline]
     pub fn real(self) -> f64 {
