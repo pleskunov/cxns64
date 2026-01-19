@@ -203,6 +203,15 @@ impl Mul for Complex64 {
     }
 }
 
+impl Mul<Complex64> for f64 {
+    type Output = Complex64;
+
+    #[inline(always)]
+    fn mul(self, rhs: Complex64) -> Self::Output {
+        Self::Output::new(rhs.re * self, rhs.im * self)
+    }
+}
+
 // c64 * f64
 impl Mul<f64> for Complex64 {
     type Output = Self;
