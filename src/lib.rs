@@ -51,6 +51,12 @@ impl Complex64 {
         Self::new(0.0, 1.0)
     }
 
+    /// Multiply `self` by the scalar `rhs`
+    #[inline]
+    pub fn scale(&self, rhs: f64) -> Self {
+        Self::new(self.re.clone() * rhs, self.im.clone() * rhs)
+    }
+
     /// A complex conjugate of `self`
     #[inline]
     pub fn conj(self) -> Self {
@@ -203,6 +209,7 @@ impl Mul for Complex64 {
     }
 }
 
+// f64 * c64
 impl Mul<Complex64> for f64 {
     type Output = Complex64;
 
@@ -361,6 +368,32 @@ impl DivAssign for Complex64 {
 mod tests {
     use super::*;
 
+    #[allow(non_upper_case_globals)]
+    const _0_0i: Complex64 = Complex64 { re: 0.0, im: 0.0 };
+    #[allow(non_upper_case_globals)]
+    const _1_0i: Complex64 = Complex64 { re: 1.0, im: 0.0 };
+    #[allow(non_upper_case_globals)]
+    const _1_1i: Complex64 = Complex64 { re: 1.0, im: 1.0 };
+    #[allow(non_upper_case_globals)]
+    const _0_1i: Complex64 = Complex64 { re: 0.0, im: 1.0 };
+    #[allow(non_upper_case_globals)]
+    const _neg1_1i: Complex64 = Complex64 { re: -1.0, im: 1.0 };
+    #[allow(non_upper_case_globals)]
+    const _05_05i: Complex64 = Complex64 { re: 0.5, im: 0.5 };
+
+    const ALL_CONSTS: [Complex64; 5] = [
+        _0_0i, _1_0i, _1_1i, _neg1_1i, _05_05i,
+    ];
+
+    fn close(a: Complex64, b: Complex64) -> bool {
+        close_to_tol(a, b, 1e-10)
+    }
+
+    fn close_to_tol(a: Complex64, b: Complex64, tol: f64) -> bool {
+        // returns true if a and b are reasonably close
+        (a == b) || (a - b).abs() < tol
+    }
+
     #[test]
     fn constructor() {
         let z = Complex64::new(2.0, 5.0);
@@ -474,6 +507,13 @@ mod tests {
     }
 
     #[test]
+    fn mul_scalar_by_complex() {
+        let a = Complex64::new(2.0, 2.0);
+        let b = 2.0 * a;
+        assert!(b == Complex64::new(4.0, 4.0));
+    }
+
+    #[test]
     fn div_by_scalar() {
         let a = Complex64::new(2.0, 2.0);
         let b = a / 2.0;
@@ -532,6 +572,32 @@ mod tests {
         let reconstructed = w * w;
 
         assert!(reconstructed == a);
+    }
+
+    #[test]
+    fn sin() {
+        assert!(close(_0_0i.sin(), _0_0i));
+        assert!(close(_1_0i.scale(std::f64::consts::PI * 2.0).sin(), _0_0i));
+        assert!(close(_0_1i.sin(), _0_1i.scale(1.0_f64.sinh())));
+        for &c in ALL_CONSTS.iter() {
+            // sin(conj(z)) = conj(sin(z))
+            assert!(close(c.conj().sin(), c.sin().conj()));
+            // sin(-z) = -sin(z)
+            assert!(close(c.scale(-1.0).sin(), c.sin().scale(-1.0)));
+        }
+    }
+
+    #[test]
+    fn cos() {
+        assert!(close(_0_0i.cos(), _1_0i));
+        assert!(close(_1_0i.scale(std::f64::consts::PI * 2.0).cos(), _1_0i));
+        assert!(close(_0_1i.cos(), _1_0i.scale(1.0_f64.cosh())));
+        for &c in ALL_CONSTS.iter() {
+            // cos(conj(z)) = conj(cos(z))
+            assert!(close(c.conj().cos(), c.cos().conj()));
+            // cos(-z) = cos(z)
+            assert!(close(c.scale(-1.0).cos(), c.cos()));
+        }
     }
 
     #[test]
