@@ -53,8 +53,8 @@ impl Complex64 {
 
     /// Multiply `self` by the scalar `rhs`
     #[inline]
-    pub fn scale(&self, rhs: f64) -> Self {
-        Self::new(self.re.clone() * rhs, self.im.clone() * rhs)
+    pub fn scale(self, rhs: f64) -> Self {
+        Self::new(self.re * rhs, self.im * rhs)
     }
 
     /// A complex conjugate of `self`
@@ -111,24 +111,18 @@ impl Complex64 {
         Self::new(re, im)
     }
 
-    /// The sine of `self`.
+    /// The sine of `self`
     #[inline]
     pub fn sin(self) -> Self {
-        // formula: sin(a + bi) = sin(a)cosh(b) + i*cos(a)sinh(b)
-        Self::new(
-            self.re.sin() * self.im.cosh(),
-            self.re.cos() * self.im.sinh(),
-        )
+        // sin(a + bi) = sin(a)cosh(b) + i*cos(a)sinh(b)
+        Self::new(self.re.sin() * self.im.cosh(), self.re.cos() * self.im.sinh())
     }
 
-    /// The cosine of `self`.
+    /// The cosine of `self`
     #[inline]
     pub fn cos(self) -> Self {
-        // formula: cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)
-        Self::new(
-            self.re.cos() * self.im.cosh(),
-            -self.re.sin() * self.im.sinh(),
-        )
+        // cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)
+        Self::new(self.re.cos() * self.im.cosh(), -self.re.sin() * self.im.sinh())
     }
 
     /// A real part of `self` 
