@@ -69,6 +69,14 @@ impl Complex64 {
         self.re.hypot(self.im)   
     }
 
+    /// Squared magnitude of `self`.
+    /// The norm calculated by this function is also 
+    /// known as field norm or absolute square.
+    #[inline]
+    pub fn norm(self) -> f64 {
+        self.re * self.re + self.im * self.im
+    }
+
     /// Check if `self` is effectively zero
     #[inline]
     pub fn is_zero(self) -> bool {
