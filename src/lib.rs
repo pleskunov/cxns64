@@ -51,6 +51,19 @@ impl Complex64 {
         Self::new(0.0, 1.0)
     }
 
+    // Constructor for a complex number with its real part set to 1.0
+    #[inline]
+    pub fn re_unit() -> Self {
+        Self::new(1.0, 0.0)
+    }
+
+    // Constructor for a complex number with its imaginary part set to 1.0
+    // This is alias for `Complex64::i()`.
+    #[inline]
+    pub fn im_unit() -> Self {
+        Self::i()
+    }
+
     /// Multiply `self` by the scalar `rhs`
     #[inline]
     pub fn scale(self, rhs: f64) -> Self {
