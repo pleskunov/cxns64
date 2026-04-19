@@ -26,8 +26,8 @@ I decided not to deal with that mess. This library is meant to be used directly,
 cxns64 = { path = "../cxns64" }
 ```
 
-3. Include it with `use cxns64::Complex64 as c64;` and you're good to go.
+3. Import it with `use cxns64::Complex64 as c64;` and you're good to go.
 
 ## Compatibility
 
-The `cxns64` crate is tested for rustc 1.94 and greater.
+The `cxns64` crate is tested with rustc 1.94 and newer.
