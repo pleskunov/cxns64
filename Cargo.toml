@@ -1,6 +1,6 @@
 [package]
 name = "cxns64"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2024"
 authors = ["Pavel Pleskunov"]
 description = "A lightweight implementation of 64-bit complex numbers for Rust"
@@ -10,6 +10,6 @@ categories = ["algorithms", "science"]
 repository = "https://github.com/pleskunov/cxns64"
 readme = "README.md"
 exclude = ["/ci/*", "/.github/*"]
-rust-version = "1.92"
+rust-version = "1.94"
 
 [dependencies]
