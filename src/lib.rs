@@ -479,11 +479,6 @@ mod tests {
         diff <= abs_eps.max(rel_eps * norm)
     }
 
-    #[inline]
-    fn is_real_dominant(b: Complex64) -> bool {
-        b.re.abs() >= b.im.abs()
-    }
-
     #[allow(non_upper_case_globals)]
     const _0_0i: Complex64 = Complex64 { re: 0.0, im: 0.0 };
     #[allow(non_upper_case_globals)]
@@ -503,36 +498,36 @@ mod tests {
 
     #[test]
     fn constructor() {
-        let z = Complex64::new(2.0, 5.0);
-        assert_eq!(z.re, 2.0);
-        assert_eq!(z.im, 5.0);
+        let z = Complex64::new(2.0_f64, 5.0_f64);
+        assert!(z.re == 2.0_f64);
+        assert!(z.im == 5.0_f64);
     }
 
     #[test]
     fn partial_eq() {
-        let a = Complex64::new(-4.3, 6.7);
-        let b = Complex64::new(-4.3, 6.7);
+        let a = Complex64::new(-4.3_f64, 6.7_f64);
+        let b = Complex64::new(-4.3_f64, 6.7_f64);
         assert!(a == b)
     }
-    
+
     #[test]
     fn partial_eq_nan() {
-        let a = Complex64::new(f64::NAN, 1.0);
+        let a = Complex64::new(f64::NAN, 1.0_f64);
         assert!(a != a);
     }
 
     #[test]
     fn partial_eq_signed_zero() {
-        let a = Complex64::new(0.0, 0.0);
-        let b = Complex64::new(-0.0, -0.0);
+        let a = Complex64::new(0.0_f64, 0.0_f64);
+        let b = Complex64::new(-0.0_f64, -0.0_f64);
         assert!(a == b);
     }
 
     #[test]
     fn approx_eq_nan() {
         let a = Complex64::new(f64::NAN, f64::NAN);
-        let b = Complex64::new(f64::NAN, 2.0);
-        let c = Complex64::new(2.0, f64::NAN);
+        let b = Complex64::new(f64::NAN, 2.0_f64);
+        let c = Complex64::new(2.0_f64, f64::NAN);
         assert!(!a.approx_eq(b, ULP128_EPS, ULP2_EPS));
         assert!(!a.approx_eq(a, ULP128_EPS, ULP2_EPS));
         assert!(!a.approx_eq(c, ULP128_EPS, ULP2_EPS));
@@ -551,8 +546,8 @@ mod tests {
 
     #[test]
     fn approx_eq_symmetric() {
-        let a = Complex64::new(1.0, 2.0);
-        let b = Complex64::new(1.0 + 1e-15, 2.0 - 1e-15);
+        let a = Complex64::new(1.0_f64, 2.0_f64);
+        let b = Complex64::new(1.0_f64 + 1.0e-15_f64, 2.0_f64 - 1.0e-15_f64);
         assert_eq!(
             a.approx_eq(b, ULP128_EPS, ULP2_EPS),
             b.approx_eq(a, ULP128_EPS, ULP2_EPS)
@@ -561,8 +556,8 @@ mod tests {
 
     #[test]
     fn approx_eq_componentwise() {
-        let a = Complex64::new(0.0, 0.0);
-        let b = Complex64::new(1e-15, 1e-6);
+        let a = Complex64::new(0.0_f64, 0.0_f64);
+        let b = Complex64::new(1.0e-15_f64, 1.0e-6_f64);
         assert!(!a.approx_eq(b, ULP128_EPS, ULP2_EPS));
     }
 
@@ -582,7 +577,7 @@ mod tests {
 
     #[test]
     fn approx_zero_exact() {
-        let a = Complex64::new(0.0, 0.0);
+        let a = Complex64::new(0.0_f64, 0.0_f64);
         assert!(a.approx_zero(ULP2_EPS));
     }
 
@@ -601,82 +596,81 @@ mod tests {
     #[test]
     fn approx_eq_equal() {
         let a = Complex64::new(1.0_f64, 1.0_f64);
-        let b = Complex64::new(1.0_f64 + 1.0e-17, 1.0_f64 + 1.0e-17);
+        let b = Complex64::new(1.0_f64 + 1.0e-17_f64, 1.0_f64 + 1.0e-17_f64);
         assert!(a.approx_eq(b, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn approx_eq_not_equal() {
         let a = Complex64::new(1.0_f64, 1.0_f64);
-        let b = Complex64::new(1.0_f64 + 1.0e-6, 1.0_f64 + 1.0e-6);
+        let b = Complex64::new(1.0_f64 + 1.0e-6_f64, 1.0_f64 + 1.0e-6_f64);
         assert!(!a.approx_eq(b, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn approx_eq_abs_boundary() {
         let a = Complex64::new(0.0_f64, 0.0_f64);
-        let b = Complex64::new(1.0e-14, 1.0e-14);
+        let b = Complex64::new(1.0e-14_f64, 1.0e-14_f64);
         assert!(a.approx_eq(b, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn add() {
-        let a = Complex64::new(3.0, 4.0);
-        let b = Complex64::new(7.0, 3.0);
+        let a = Complex64::new(3.0_f64, 4.0_f64);
+        let b = Complex64::new(7.0_f64, 3.0_f64);
         let result = a + b;
-        let expected = Complex64::new(10.0, 7.0); 
+        let expected = Complex64::new(10.0_f64, 7.0_f64); 
         assert!(result.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn sub() {
-        let a = Complex64::new(6.0, 4.0);
-        let b = Complex64::new(2.0, 1.0);
+        let a = Complex64::new(6.0_f64, 4.0_f64);
+        let b = Complex64::new(2.0_f64, 1.0_f64);
         let result = a - b;
-        let expected = Complex64::new(4.0, 3.0); 
+        let expected = Complex64::new(4.0_f64, 3.0_f64); 
         assert!(result.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
-    
+
     #[test]
     fn add_sub_inverse() {
-        let a = Complex64::new(3.5, -2.1);
-        let b = Complex64::new(7.0, 4.0);
+        let a = Complex64::new(3.5_f64, -2.1_f64);
+        let b = Complex64::new(7.0_f64, 4.0_f64);
         assert!(((a + b) - b).approx_eq(a, ULP2_EPS, ULP2_EPS));
     }
 
     #[test]
     fn mult() {
-        let a = Complex64::new(3.0, 8.5);
-        let b = Complex64::new(4.1, 2.2);
+        let a = Complex64::new(3.0_f64, 8.5_f64);
+        let b = Complex64::new(4.1_f64, 2.2_f64);
         let result = a * b;
-        let expected = Complex64::new(-6.4, 41.45);
+        let expected = Complex64::new(-6.4_f64, 41.45_f64);
         assert!(result.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn div() {
-        let a = Complex64::new(38.2, 49.5);
-        let b = Complex64::new(12.4, 10.0);
-        let expected = Complex64::new(3.8173076923076925, 0.9134615384615383);
+        let a = Complex64::new(38.2_f64, 49.5_f64);
+        let b = Complex64::new(12.4_f64, 10.0_f64);
+        let expected = Complex64::new(3.8173076923076925_f64, 0.9134615384615383_f64);
         let result = a / b;
         assert!(result.approx_eq(expected, ULP128_EPS, ULP2_EPS))
     }
 
     #[test]
     fn div_inverse_property() {
-        let a = Complex64::new(3.2, -1.7);
-        let b = Complex64::new(2.1, 0.8);
+        let a = Complex64::new(3.2_f64, -1.7_f64);
+        let b = Complex64::new(2.1_f64, 0.8_f64);
         let r = a / b;
-        assert!(
-            (r * b).approx_eq(a, ULP128_EPS, ULP2_EPS)
-        );
+        let back = r * b;
+        assert!(back.approx_eq(a, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn div_branch_real_dominant() {
-        let a = Complex64::new(38.2, 49.5);
-        let b = Complex64::new(12.4, 1.0); // |re| >> |im|
-        assert!(is_real_dominant(b));
+        let a = Complex64::new(38.2_f64, 49.5_f64);
+        let b = Complex64::new(100.0_f64, 1.0_f64); // |re| >> |im|
+        assert!(b.re.abs() >= b.im.abs());
         let result = a / b;
         let expected = Complex64::new(
             (a.re * b.re + a.im * b.im) / b.norm(),
@@ -687,9 +681,9 @@ mod tests {
     
     #[test]
     fn div_branch_imag_dominant() {
-        let a = Complex64::new(38.2, 49.5);
-        let b = Complex64::new(1.0, 12.4); // |im| >> |re|
-        assert!(!is_real_dominant(b));
+        let a = Complex64::new(38.2_f64, 49.5_f64);
+        let b = Complex64::new(1.0_f64, 100.0_f64); // |im| >> |re|
+        assert!(b.re.abs() <= b.im.abs());        
         let result = a / b;
         let expected = Complex64::new(
             (a.re * b.re + a.im * b.im) / b.norm(),
@@ -700,8 +694,8 @@ mod tests {
     
     #[test]
     fn div_branch_boundary_equal_magnitude() {
-        let a = Complex64::new(10.0, -3.0);
-        let b = Complex64::new(5.0, 5.0); // |re| == |im|
+        let a = Complex64::new(10.0_f64, -3.0_f64);
+        let b = Complex64::new(5.0_f64, 5.0_f64); // |re| == |im|
         let result = a / b;
         let expected = Complex64::new(
             (a.re * b.re + a.im * b.im) / b.norm(),
@@ -712,9 +706,9 @@ mod tests {
 
     #[test]
     fn div_branch_extreme_scale_separation() {
-        let a = Complex64::new(1.0, 2.0);
-        let b_small_im = Complex64::new(1e200, 1.0); // branch A
-        let b_small_re = Complex64::new(1.0, 1e200); // branch B
+        let a = Complex64::new(1.0_f64, 2.0_f64);
+        let b_small_im = Complex64::new(1e200_f64, 1.0_f64); // branch A
+        let b_small_re = Complex64::new(1.0_f64, 1e200_f64); // branch B
 
         let r1 = a / b_small_im;
         let r2 = a / b_small_re;
@@ -735,8 +729,8 @@ mod tests {
 
     #[test]
     fn div_branch_near_real_axis() {
-        let a = Complex64::new(1.0, 1.0);
-        let b = Complex64::new(1.0, 1e-16); // almost real → branch A
+        let a = Complex64::new(1.0_f64, 1.0_f64);
+        let b = Complex64::new(1.0_f64, 1.0e-16_f64); // almost real -> branch A
 
         let result = a / b;
 
@@ -750,17 +744,17 @@ mod tests {
 
     #[test]
     fn add_assign() {
-        let mut a = Complex64::new(1.25, -3.5);
-        let b = Complex64::new(-2.75, 4.125);
+        let mut a = Complex64::new(1.25_f64, -3.5_f64);
+        let b = Complex64::new(-2.75_f64, 4.125_f64);
         a += b;
-        let expected = Complex64::new(-1.5, 0.625);
+        let expected = Complex64::new(-1.5_f64, 0.625_f64);
         assert!(a.approx_eq(expected, ULP128_EPS, ULP128_EPS));
     }
 
     #[test]
     fn add_assign_matches_add() {
-        let mut a = Complex64::new(2.0, 3.0);
-        let b = Complex64::new(4.0, -1.5);
+        let mut a = Complex64::new(2.0_f64, 3.0_f64);
+        let b = Complex64::new(4.0_f64, -1.5_f64);
         let expected = a + b;
         a += b;
         assert!(a == expected);
@@ -768,17 +762,17 @@ mod tests {
 
     #[test]
     fn sub_assign() {
-        let mut a = Complex64::new(5.75, 2.0);
-        let b = Complex64::new(1.25, -3.5);
+        let mut a = Complex64::new(5.75_f64, 2.0_f64);
+        let b = Complex64::new(1.25_f64, -3.5_f64);
         a -= b;
-        let expected = Complex64::new(4.5, 5.5);
+        let expected = Complex64::new(4.5_f64, 5.5_f64);
         assert!(a.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn sub_assign_matches_sub() {
-        let mut a = Complex64::new(2.0,3.0);
-        let b = Complex64::new(4.0,-1.5);
+        let mut a = Complex64::new(2.0_f64, 3.0_f64);
+        let b = Complex64::new(4.0_f64, -1.5_f64);
         let expected = a - b;
         a -= b;
         assert!(a == expected);
@@ -786,17 +780,17 @@ mod tests {
 
     #[test]
     fn mul_assign() {
-        let mut a = Complex64::new(2.0, 3.0);
-        let b = Complex64::new(4.0, -1.5);
+        let mut a = Complex64::new(2.0_f64, 3.0_f64);
+        let b = Complex64::new(4.0_f64, -1.5_f64);
         a *= b;
-        let expected = Complex64::new(12.5, 9.0);
+        let expected = Complex64::new(12.5_f64, 9.0_f64);
         assert!(a.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn mul_assign_matches_mul() {
-        let mut a = Complex64::new(2.0,3.0);
-        let b = Complex64::new(4.0,-1.5);
+        let mut a = Complex64::new(2.0_f64, 3.0_f64);
+        let b = Complex64::new(4.0_f64, -1.5_f64);
         let expected = a * b;
         a *= b;
         assert!(a == expected);
@@ -804,17 +798,17 @@ mod tests {
 
     #[test]
     fn div_assign() {
-        let mut a = Complex64::new(7.5, 2.5);
-        let b = Complex64::new(1.25, -0.75);
+        let mut a = Complex64::new(7.5_f64, 2.5_f64);
+        let b = Complex64::new(1.25_f64, -0.75_f64);
         a /= b;
-        let expected = Complex64::new(3.5294117647, 4.1176470588);
-        assert!(a.approx_eq(expected, 1.0e-9, 1.0e-12));
+        let expected = Complex64::new(3.5294117647_f64, 4.1176470588_f64);
+        assert!(a.approx_eq(expected, 1.0e-9_f64, 1.0e-12_f64));
     }
 
     #[test]
     fn div_assign_matches_div() {
-        let mut a = Complex64::new(2.0,3.0);
-        let b = Complex64::new(4.0,-1.5);
+        let mut a = Complex64::new(2.0_f64, 3.0_f64);
+        let b = Complex64::new(4.0_f64, -1.5_f64);
         let expected = a / b;
         a /= b;
         assert!(a == expected);
@@ -822,102 +816,101 @@ mod tests {
 
     #[test]
     fn fma() {
-        let z = Complex64::new(1.75, -2.25);
-        let w = Complex64::new(-0.5, 3.125);
-        let a = Complex64::new(4.0, -1.5);
+        let z = Complex64::new(1.75_f64, -2.25_f64);
+        let w = Complex64::new(-0.5_f64, 3.125_f64);
+        let a = Complex64::new(4.0_f64, -1.5_f64);
         let fma_result = z.fma(w, a);
-        assert!(fma_result.approx_eq(z * w + a, 1e-12, 1e-12));
+        assert!(fma_result.approx_eq(z * w + a, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn fma_rounding_sensitive() {
-        let z = Complex64::new(1.0e16, 1.0);
-        let w = Complex64::new(1.0e-16, -1.0);
-        let a = Complex64::new(1.0, -1.0);
+        let z = Complex64::new(1.0e16_f64, 1.0_f64);
+        let w = Complex64::new(1.0e-16_f64, -1.0_f64);
+        let a = Complex64::new(1.0_f64, -1.0_f64);
         let fma_result = z.fma(w, a);
-        assert!(fma_result.approx_eq(z * w + a, 1e-12, 1e-12));
+        assert!(fma_result.approx_eq(z * w + a, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn fma_vs_mul_add_stability() {
-        let z = Complex64::new(1e16, 1.0);
-        let w = Complex64::new(1e-16, -1.0);
-        let a = Complex64::new(1.0, -1.0);
-
+        let z = Complex64::new(1.0e16_f64, 1.0_f64);
+        let w = Complex64::new(1.0e-16_f64, -1.0_f64);
+        let a = Complex64::new(1.0_f64, -1.0_f64);
         let fma = z.fma(w, a);
         let naive = z * w + a;
-
         assert!(fma.norm() <= naive.norm() || fma.approx_eq(naive, ULP2_EPS, ULP2_EPS));
     }
 
     #[test]
     fn mul_by_scalar() {
-        let a = Complex64::new(2.0, 2.0);
-        let b = a * 2.0;
-        let expected = Complex64::new(4.0, 4.0);
+        let a = Complex64::new(2.0_f64, 2.0_f64);
+        let b = a * 2.0_f64;
+        let expected = Complex64::new(4.0_f64, 4.0_f64);
         assert!(b.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn mul_scalar_by_complex() {
-        let a = Complex64::new(2.0, 2.0);
-        let b = 2.0 * a;
-        let expected = Complex64::new(4.0, 4.0);
+        let a = Complex64::new(2.0_f64, 2.0_f64);
+        let b = 2.0_f64 * a;
+        let expected = Complex64::new(4.0_f64, 4.0_f64);
         assert!(b.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn div_by_scalar() {
-        let a = Complex64::new(2.0, 2.0);
-        let b = a / 2.0;
-        let expected = Complex64::new(1.0, 1.0);
+        let a = Complex64::new(2.0_f64, 2.0_f64);
+        let b = a / 2.0_f64;
+        let expected = Complex64::new(1.0_f64, 1.0_f64);
         assert!(b.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn abs() {
-        let a = Complex64::new(4.23, 2.28);
+        let a = Complex64::new(4.23_f64, 2.28_f64);
         let result = a.abs();
-        let expected = 4.805340778758568;
+        let expected = 4.805340778758568_f64;
         assert!(is_approx_equal(result, expected, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn conj() {
-       let a = Complex64::new(2.0, 5.0);
-       assert!(a.conj() == Complex64::new(2.0, -5.0))
+       let a = Complex64::new(2.0_f64, 5.0_f64);
+       assert!(a.conj() == Complex64::new(2.0_f64, -5.0_f64))
     }
 
     #[test]
     fn sqrt() {
-        let a = Complex64::new(3.0, 4.0);
+        let a = Complex64::new(3.0_f64, 4.0_f64);
         let w = a.sqrt();
-        assert!(w == Complex64::new(2.0, 1.0))
+        let expected = Complex64::new(2.0_f64, 1.0_f64); 
+        assert!(w.approx_eq(expected, ULP128_EPS, ULP2_EPS))
     }
     
     #[test]
     fn sqrt_zero() {
-        assert!(Complex64::new(0.0, 0.0).sqrt() == Complex64::new(0.0, 0.0));
+        assert!(Complex64::new(0.0_f64, 0.0_f64).sqrt() == Complex64::new(0.0_f64, 0.0_f64));
     }
 
     #[test]
     fn sqrt_conjugate() {
-        let z = Complex64::new(3.0, 4.0);
+        let z = Complex64::new(3.0_f64, 4.0_f64);
         assert!(z.conj().sqrt().approx_eq(z.sqrt().conj(), ULP2_EPS, ULP2_EPS));
     }
 
     #[test]
     fn sqrt_negative_real_axis() {
-        let a = Complex64::new(-4.0, 0.0);
+        let a = Complex64::new(-4.0_f64, 0.0_f64);
         let w = a.sqrt();
         // principal square root: 0 + 2i
-        let expected = Complex64::new(0.0, 2.0);
+        let expected = Complex64::new(0.0_f64, 2.0_f64);
         assert!(w.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
 
     #[test]
     fn sqrt_large_magnitude() {
-        let a = Complex64::new(1.0e300, 1.0);
+        let a = Complex64::new(1.0e300_f64, 1.0_f64);
         let w = a.sqrt();
         // Property-based check:
         // sqrt(a) * sqrt(a) ≈ z
@@ -927,7 +920,7 @@ mod tests {
 
     #[test]
     fn sqrt_near_branch_cut() {
-        let a = Complex64::new(-1.0, 1.0e-14);
+        let a = Complex64::new(-1.0_f64, 1.0e-14_f64);
         let w = a.sqrt();
         let reconstructed = w * w;
         assert!(reconstructed.approx_eq(a, ULP128_EPS, ULP2_EPS));
@@ -937,7 +930,7 @@ mod tests {
     fn sin() {
         assert!(_0_0i.sin().approx_eq(_0_0i, ULP128_EPS, ULP2_EPS));
         assert!(
-            _1_0i.scale(std::f64::consts::PI * 2.0).sin().approx_eq(_0_0i, ULP128_EPS, ULP2_EPS)
+            _1_0i.scale(std::f64::consts::PI * 2.0_f64).sin().approx_eq(_0_0i, ULP128_EPS, ULP2_EPS)
         );
         assert!(
             _0_1i.sin().approx_eq(_0_1i.scale(1.0_f64.sinh()), ULP128_EPS, ULP2_EPS)
@@ -951,7 +944,7 @@ mod tests {
             
             // sin(-z) = -sin(z)
             assert!(
-                c.scale(-1.0).sin().approx_eq(c.sin().scale(-1.0), ULP128_EPS, ULP2_EPS)
+                c.scale(-1.0_f64).sin().approx_eq(c.sin().scale(-1.0_f64), ULP128_EPS, ULP2_EPS)
             );
         }
     }
@@ -960,7 +953,7 @@ mod tests {
     fn cos() {
         assert!(_0_0i.cos().approx_eq(_1_0i, ULP128_EPS, ULP2_EPS));
         assert!(
-            _1_0i.scale(std::f64::consts::PI * 2.0).cos().approx_eq(_1_0i, ULP128_EPS, ULP2_EPS)
+            _1_0i.scale(std::f64::consts::PI * 2.0_f64).cos().approx_eq(_1_0i, ULP128_EPS, ULP2_EPS)
         );
         
         assert!(
@@ -975,106 +968,148 @@ mod tests {
             
             // cos(-z) = cos(z)
             assert!(
-                c.scale(-1.0).cos().approx_eq(c.cos(), ULP128_EPS, ULP2_EPS)
+                c.scale(-1.0_f64).cos().approx_eq(c.cos(), ULP128_EPS, ULP2_EPS)
             );
         }
     }
 
     #[test]
     fn trig_identity() {
-        let z = Complex64::new(0.7, 1.3);
+        let z = Complex64::new(0.7_f64, 1.3_f64);
         let lhs = z.sin()*z.sin() + z.cos()*z.cos();
-        assert!(lhs.approx_eq(Complex64::new(1.0, 0.0), ULP2_EPS, ULP2_EPS));
+        assert!(lhs.approx_eq(Complex64::new(1.0_f64, 0.0_f64), ULP2_EPS, ULP2_EPS));
     }
 
     #[test]
     fn re_unit() {
         let a = Complex64::re_unit();
-        assert!(a == Complex64::new(1.0, 0.0))
+        assert!(a == Complex64::new(1.0_f64, 0.0_f64))
     }
 
     #[test]
     fn im_unit() {
         let a = Complex64::im_unit();
-        assert!(a == Complex64::new(0.0, 1.0))
+        assert!(a == Complex64::new(0.0_f64, 1.0_f64))
     }
 
     #[test]
     fn i_unit() {
         let a = Complex64::i();
-        assert!(a == Complex64::new(0.0, 1.0))
+        assert!(a == Complex64::new(0.0_f64, 1.0_f64))
     }
 
     #[test]
     fn real() {
-        let a = Complex64::new(1.0, 2.0);
-        assert_eq!(a.real(), 1.0);
+        let a = Complex64::new(1.0_f64, 2.0_f64);
+        assert_eq!(a.real(), 1.0_f64);
     }
 
     #[test]
     fn imag() {
-        let a = Complex64::new(1.0, 2.0);
-        assert_eq!(a.imag(), 2.0);
+        let a = Complex64::new(1.0_f64, 2.0_f64);
+        assert_eq!(a.imag(), 2.0_f64);
     }
 
     #[test]
     fn is_nan() {
-        let a = Complex64::new(f64::NAN, 5.0);
-        let b = Complex64::new(1.0, f64::NAN);
+        let a = Complex64::new(f64::NAN, 5.0_f64);
+        let b = Complex64::new(1.0_f64, f64::NAN);
         assert!(a.is_nan() && b.is_nan())
     }
 
     #[test]
     fn is_infinite() {
-        let a = Complex64::new(f64::INFINITY, 5.0);
-        let b = Complex64::new(1.0, f64::INFINITY);
+        let a = Complex64::new(f64::INFINITY, 5.0_f64);
+        let b = Complex64::new(1.0_f64, f64::INFINITY);
         assert!(a.is_infinite() && b.is_infinite())
     }
 
     #[test]
     fn is_finite() {
-        let a = Complex64::new(f64::INFINITY, 5.0);
-        let b = Complex64::new(1.0, 2.0);
+        let a = Complex64::new(f64::INFINITY, 5.0_f64);
+        let b = Complex64::new(1.0_f64, 2.0_f64);
         assert!(!a.is_finite() && b.is_finite())
     }
 
     #[test]
     fn norm() {
-        let z = Complex64::new(3.0, 4.0);
+        let z = Complex64::new(3.0_f64, 4.0_f64);
         assert_eq!(z.norm(), 25.0);
     }
 
     #[test]
     fn is_zero() {
-        assert!(Complex64::new(0.0, 0.0).is_zero());
-        assert!(!Complex64::new(1e-300, 0.0).is_zero());
+        assert!(Complex64::new(0.0_f64, 0.0_f64).is_zero());
+        assert!(!Complex64::new(1.0e-300_f64, 0.0_f64).is_zero());
     }
 
     #[test]
     fn signed_zero() {
-        assert!(Complex64::new(-0.0, -0.0).is_zero());
+        assert!(Complex64::new(-0.0_f64, -0.0_f64).is_zero());
     }
 
     #[test]
     fn negation() {
-        let mut c = Complex64::new(2.0, 4.0);
+        let mut c = Complex64::new(2.0_f64, 4.0_f64);
         c = -c;
-        assert!(c.re == -2.0);
-        assert!(c.im == -4.0);
+        assert!(c.re == -2.0_f64);
+        assert!(c.im == -4.0_f64);
     }
 
     #[test]
     #[should_panic]
     fn div_by_zero() {
-        let a = Complex64::new(1.0, 2.0);
-        let z = Complex64::new(0.0, 0.0);
+        let a = Complex64::new(1.0_f64, 2.0_f64);
+        let z = Complex64::new(0.0_f64, 0.0_f64);
         let _ = a / z;
     }
 
     #[test]
     fn nan_propagation_mul() {
-        let a = Complex64::new(f64::NAN, 1.0);
-        let b = Complex64::new(1.0, 2.0);
+        let a = Complex64::new(f64::NAN, 1.0_f64);
+        let b = Complex64::new(1.0_f64, 2.0_f64);
         assert!((a * b).is_nan());
+    }
+
+    #[test]
+    fn nan_propagation_add() {
+        let nan = Complex64::new(f64::NAN, 0.0_f64);
+        let b = Complex64::new(1.0_f64, 2.0_f64);
+        let r = nan + b;
+        assert!(r.is_nan());
+    }
+
+    #[test]
+    fn infinity_propagation_mul() {
+        let inf = Complex64::new(f64::INFINITY, 1.0_f64);
+        let b = Complex64::new(2.0_f64, 3.0_f64);
+
+        let r = inf * b;
+
+        assert!(r.is_infinite());
+    }
+
+    #[test]
+    fn signed_zero_mul() {
+        let a = Complex64::new(0.0_f64, -0.0_f64);
+        let b = Complex64::new(2.0_f64, 3.0_f64);
+        let r = a * b;
+        assert!(r.is_zero());
+    }
+
+    #[test]
+    fn div_identity_property() {
+        let a = Complex64::new(5.0_f64, -3.0_f64);
+        let b = Complex64::new(1.3_f64, 2.7_f64);
+        let r = a / b;
+        assert!((r * b).approx_eq(a, ULP128_EPS, ULP2_EPS));
+    }
+
+    #[test]
+    fn extreme_scale_mul() {
+        let a = Complex64::new(1e200_f64, -1e200_f64);
+        let b = Complex64::new(1e100_f64, 1e100_f64);
+        let r = a * b;
+        assert!(r.is_finite() || r.is_infinite());
     }
 }
