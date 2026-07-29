@@ -497,6 +497,13 @@ mod tests {
     ];
 
     #[test]
+    fn default() {
+        let z = Complex64::default();
+        assert!(z.re == 0.0_f64);
+        assert!(z.im == 0.0_f64);
+    }
+
+    #[test]
     fn constructor() {
         let z = Complex64::new(2.0_f64, 5.0_f64);
         assert!(z.re == 2.0_f64);
