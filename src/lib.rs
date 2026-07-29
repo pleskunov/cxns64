@@ -31,7 +31,7 @@ pub const ULP2_EPS: f64 = 2.0_f64 * f64::EPSILON;
 
 /// Approximately 128 machine epsilons around 1.0.
 #[allow(unused)]
-pub const ULP128_EPS: f64 = 128.0_f64 * f64::EPSILON; 
+pub const ULP128_EPS: f64 = 128.0_f64 * f64::EPSILON;
 
 /// A 64-bit floating-point complex number in Cartesian form
 #[repr(C)]
@@ -41,7 +41,7 @@ pub struct Complex64 {
     pub im: f64,
 }
 
-impl Complex64 { 
+impl Complex64 {
     /// Constructor
     #[inline(always)]
     pub fn new(re: f64, im: f64) -> Self {
@@ -76,17 +76,20 @@ impl Complex64 {
     /// A complex conjugate of `self`
     #[inline(always)]
     pub fn conj(self) -> Self {
-       Self { re: self.re, im: -self.im } 
+        Self {
+            re: self.re,
+            im: -self.im,
+        }
     }
 
     /// An absolute value of `self`
     #[inline(always)]
     pub fn abs(self) -> f64 {
-        self.re.hypot(self.im)   
+        self.re.hypot(self.im)
     }
 
     /// Squared magnitude of `self`.
-    /// The norm calculated by this function is also 
+    /// The norm calculated by this function is also
     /// known as field norm or absolute square.
     #[inline(always)]
     pub fn norm(self) -> f64 {
@@ -101,33 +104,36 @@ impl Complex64 {
 
     /// A principal square root of `self`
     #[inline]
-    pub fn sqrt(self) -> Self { 
+    pub fn sqrt(self) -> Self {
         let re0: f64 = self.re;
         let im0: f64 = self.im;
 
         if re0 == 0.0_f64 && im0 == 0.0_f64 {
-            return Self::new(0.0, 0.0)
+            return Self::new(0.0, 0.0);
         }
 
         let x: f64 = re0.abs();
         let y: f64 = im0.abs();
 
         let w: f64 = match x >= y {
-            true => {  
+            true => {
                 let r: f64 = y / x;
                 x.sqrt() * (0.5 * (1.0 + (1.0 + r * r).sqrt())).sqrt()
-            },
+            }
             false => {
                 let r: f64 = x / y;
                 y.sqrt() * (0.5 * (r + (1.0 + r * r).sqrt())).sqrt()
-            },
+            }
         };
 
         let (re, im) = match re0 >= 0.0 {
             true => (w, im0 / (2.0 * w)),
-            false => { 
-                let im = match im0 >= 0.0 { true => w, false => -w, };
-                (im0 / (2.0 * im), im) 
+            false => {
+                let im = match im0 >= 0.0 {
+                    true => w,
+                    false => -w,
+                };
+                (im0 / (2.0 * im), im)
             }
         };
 
@@ -138,17 +144,23 @@ impl Complex64 {
     #[inline(always)]
     pub fn sin(self) -> Self {
         // sin(a + bi) = sin(a)cosh(b) + i*cos(a)sinh(b)
-        Self::new(self.re.sin() * self.im.cosh(), self.re.cos() * self.im.sinh())
+        Self::new(
+            self.re.sin() * self.im.cosh(),
+            self.re.cos() * self.im.sinh(),
+        )
     }
 
     /// The cosine of `self`
     #[inline(always)]
     pub fn cos(self) -> Self {
         // cos(a + bi) = cos(a)cosh(b) - i*sin(a)sinh(b)
-        Self::new(self.re.cos() * self.im.cosh(), -self.re.sin() * self.im.sinh())
+        Self::new(
+            self.re.cos() * self.im.cosh(),
+            -self.re.sin() * self.im.sinh(),
+        )
     }
 
-    /// A real part of `self` 
+    /// A real part of `self`
     #[inline(always)]
     pub fn real(self) -> f64 {
         self.re
@@ -177,7 +189,7 @@ impl Complex64 {
     pub fn is_finite(self) -> bool {
         self.re.is_finite() && self.im.is_finite()
     }
- 
+
     /// Comparison using the relative and absolute epsilon.
     ///
     /// # Arguments
@@ -189,10 +201,10 @@ impl Complex64 {
     /// True if `self` is approximately equal `rhs` and false otherwise.
     ///
     /// # Notes
-    /// Two complex numbers are approximately equal if their real and 
+    /// Two complex numbers are approximately equal if their real and
     /// imaginary components are approximately equal independently.
     #[inline]
-    pub fn approx_eq(self, rhs: Self, abs_eps: f64, rel_eps: f64) -> bool {    
+    pub fn approx_eq(self, rhs: Self, abs_eps: f64, rel_eps: f64) -> bool {
         debug_assert!(rel_eps >= f64::EPSILON);
         debug_assert!(rel_eps < 1.0_f64);
         debug_assert!(abs_eps > 0.0_f64);
@@ -230,7 +242,7 @@ impl Complex64 {
     /// True if `self` is approximately (less or equal to the error margin) equal 0.0 and false otherwise.
     ///
     /// # Notes
-    /// - Typically, setting `abs_eps` to `f64::EPSILON`, or some small multiple 
+    /// - Typically, setting `abs_eps` to `f64::EPSILON`, or some small multiple
     /// of `f64::EPSILON` works well. Make it larger if greater error is expected.
     #[inline]
     pub fn approx_zero(self, abs_eps: f64) -> bool {
@@ -272,7 +284,7 @@ impl PartialEq for Complex64 {
 }
 
 /// Addition, subtraction, multiplication and division operators
-use core::ops::{Add, Sub, Mul, Div, Neg};
+use core::ops::{Add, Div, Mul, Neg, Sub};
 
 pub trait MulAdd<Rhs = Self, Acc = Self> {
     type Output;
@@ -344,7 +356,7 @@ impl MulAdd for f64 {
 // (a + i b) * (c + i d) + (e + i f) == ((a*c + e) - b*d) + i (a*d + (b*c + f))
 impl MulAdd for Complex64 {
     type Output = Self;
-    
+
     /// Fused multiply add: `self` + `rhs` + `acc`
     #[inline]
     fn fma(self, rhs: Self, acc: Self) -> Self::Output {
@@ -387,7 +399,7 @@ impl Div for Complex64 {
 // c64 = -c64
 impl Neg for Complex64 {
     type Output = Self;
-    
+
     #[inline(always)]
     fn neg(self) -> Self::Output {
         Self::Output::new(-self.re, -self.im)
@@ -405,7 +417,7 @@ impl Div<f64> for Complex64 {
 }
 
 /// Addition, subtraction, multiplication and division assignment operators
-use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign};
+use core::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 impl AddAssign for Complex64 {
     #[inline(always)]
@@ -448,7 +460,7 @@ impl DivAssign for Complex64 {
         let im: f64;
         let r: f64;
         let denom: f64;
-        
+
         if rhs.im.abs() <= rhs.re.abs() {
             r = rhs.im / rhs.re;
             denom = rhs.re + r * rhs.im;
@@ -492,9 +504,7 @@ mod tests {
     #[allow(non_upper_case_globals)]
     const _05_05i: Complex64 = Complex64 { re: 0.5, im: 0.5 };
 
-    const ALL_CONSTS: [Complex64; 5] = [
-        _0_0i, _1_0i, _1_1i, _neg1_1i, _05_05i,
-    ];
+    const ALL_CONSTS: [Complex64; 5] = [_0_0i, _1_0i, _1_1i, _neg1_1i, _05_05i];
 
     #[test]
     fn default() {
@@ -626,7 +636,7 @@ mod tests {
         let a = Complex64::new(3.0_f64, 4.0_f64);
         let b = Complex64::new(7.0_f64, 3.0_f64);
         let result = a + b;
-        let expected = Complex64::new(10.0_f64, 7.0_f64); 
+        let expected = Complex64::new(10.0_f64, 7.0_f64);
         assert!(result.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
 
@@ -635,7 +645,7 @@ mod tests {
         let a = Complex64::new(6.0_f64, 4.0_f64);
         let b = Complex64::new(2.0_f64, 1.0_f64);
         let result = a - b;
-        let expected = Complex64::new(4.0_f64, 3.0_f64); 
+        let expected = Complex64::new(4.0_f64, 3.0_f64);
         assert!(result.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
 
@@ -685,12 +695,12 @@ mod tests {
         );
         assert!(result.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
-    
+
     #[test]
     fn div_branch_imag_dominant() {
         let a = Complex64::new(38.2_f64, 49.5_f64);
         let b = Complex64::new(1.0_f64, 100.0_f64); // |im| >> |re|
-        assert!(b.re.abs() <= b.im.abs());        
+        assert!(b.re.abs() <= b.im.abs());
         let result = a / b;
         let expected = Complex64::new(
             (a.re * b.re + a.im * b.im) / b.norm(),
@@ -698,7 +708,7 @@ mod tests {
         );
         assert!(result.approx_eq(expected, ULP128_EPS, ULP2_EPS));
     }
-    
+
     #[test]
     fn div_branch_boundary_equal_magnitude() {
         let a = Complex64::new(10.0_f64, -3.0_f64);
@@ -883,18 +893,18 @@ mod tests {
 
     #[test]
     fn conj() {
-       let a = Complex64::new(2.0_f64, 5.0_f64);
-       assert!(a.conj() == Complex64::new(2.0_f64, -5.0_f64))
+        let a = Complex64::new(2.0_f64, 5.0_f64);
+        assert!(a.conj() == Complex64::new(2.0_f64, -5.0_f64))
     }
 
     #[test]
     fn sqrt() {
         let a = Complex64::new(3.0_f64, 4.0_f64);
         let w = a.sqrt();
-        let expected = Complex64::new(2.0_f64, 1.0_f64); 
+        let expected = Complex64::new(2.0_f64, 1.0_f64);
         assert!(w.approx_eq(expected, ULP128_EPS, ULP2_EPS))
     }
-    
+
     #[test]
     fn sqrt_zero() {
         assert!(Complex64::new(0.0_f64, 0.0_f64).sqrt() == Complex64::new(0.0_f64, 0.0_f64));
@@ -903,7 +913,10 @@ mod tests {
     #[test]
     fn sqrt_conjugate() {
         let z = Complex64::new(3.0_f64, 4.0_f64);
-        assert!(z.conj().sqrt().approx_eq(z.sqrt().conj(), ULP2_EPS, ULP2_EPS));
+        assert!(z
+            .conj()
+            .sqrt()
+            .approx_eq(z.sqrt().conj(), ULP2_EPS, ULP2_EPS));
     }
 
     #[test]
@@ -936,54 +949,61 @@ mod tests {
     #[test]
     fn sin() {
         assert!(_0_0i.sin().approx_eq(_0_0i, ULP128_EPS, ULP2_EPS));
-        assert!(
-            _1_0i.scale(std::f64::consts::PI * 2.0_f64).sin().approx_eq(_0_0i, ULP128_EPS, ULP2_EPS)
-        );
-        assert!(
-            _0_1i.sin().approx_eq(_0_1i.scale(1.0_f64.sinh()), ULP128_EPS, ULP2_EPS)
-        );
+        assert!(_1_0i
+            .scale(std::f64::consts::PI * 2.0_f64)
+            .sin()
+            .approx_eq(_0_0i, ULP128_EPS, ULP2_EPS));
+        assert!(_0_1i
+            .sin()
+            .approx_eq(_0_1i.scale(1.0_f64.sinh()), ULP128_EPS, ULP2_EPS));
         for &c in ALL_CONSTS.iter() {
             // sin(conj(z)) = conj(sin(z))
-            
-            assert!(
-                c.conj().sin().approx_eq(c.sin().conj(), ULP128_EPS, ULP2_EPS)
-            );
-            
+
+            assert!(c
+                .conj()
+                .sin()
+                .approx_eq(c.sin().conj(), ULP128_EPS, ULP2_EPS));
+
             // sin(-z) = -sin(z)
-            assert!(
-                c.scale(-1.0_f64).sin().approx_eq(c.sin().scale(-1.0_f64), ULP128_EPS, ULP2_EPS)
-            );
+            assert!(c.scale(-1.0_f64).sin().approx_eq(
+                c.sin().scale(-1.0_f64),
+                ULP128_EPS,
+                ULP2_EPS
+            ));
         }
     }
 
     #[test]
     fn cos() {
         assert!(_0_0i.cos().approx_eq(_1_0i, ULP128_EPS, ULP2_EPS));
-        assert!(
-            _1_0i.scale(std::f64::consts::PI * 2.0_f64).cos().approx_eq(_1_0i, ULP128_EPS, ULP2_EPS)
-        );
-        
-        assert!(
-            _0_1i.cos().approx_eq(_1_0i.scale(1.0_f64.cosh()), ULP128_EPS, ULP2_EPS)
-        );
+        assert!(_1_0i
+            .scale(std::f64::consts::PI * 2.0_f64)
+            .cos()
+            .approx_eq(_1_0i, ULP128_EPS, ULP2_EPS));
+
+        assert!(_0_1i
+            .cos()
+            .approx_eq(_1_0i.scale(1.0_f64.cosh()), ULP128_EPS, ULP2_EPS));
 
         for &c in ALL_CONSTS.iter() {
             // cos(conj(z)) = conj(cos(z))
-            assert!(
-                c.conj().cos().approx_eq(c.cos().conj(), ULP128_EPS, ULP2_EPS)
-            );
-            
+            assert!(c
+                .conj()
+                .cos()
+                .approx_eq(c.cos().conj(), ULP128_EPS, ULP2_EPS));
+
             // cos(-z) = cos(z)
-            assert!(
-                c.scale(-1.0_f64).cos().approx_eq(c.cos(), ULP128_EPS, ULP2_EPS)
-            );
+            assert!(c
+                .scale(-1.0_f64)
+                .cos()
+                .approx_eq(c.cos(), ULP128_EPS, ULP2_EPS));
         }
     }
 
     #[test]
     fn trig_identity() {
         let z = Complex64::new(0.7_f64, 1.3_f64);
-        let lhs = z.sin()*z.sin() + z.cos()*z.cos();
+        let lhs = z.sin() * z.sin() + z.cos() * z.cos();
         assert!(lhs.approx_eq(Complex64::new(1.0_f64, 0.0_f64), ULP2_EPS, ULP2_EPS));
     }
 
