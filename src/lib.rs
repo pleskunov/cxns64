@@ -42,30 +42,27 @@ pub struct Complex64 {
 }
 
 impl Complex64 {
-    /// Constructor
+    /// Constructs a complex number from its real and imaginary parts.
+    #[must_use]
     #[inline(always)]
-    pub fn new(re: f64, im: f64) -> Self {
+    pub const fn new(re: f64, im: f64) -> Self {
         Self { re, im }
     }
 
-    // Constructor for a complex number with its real part set to 1.0
-    #[inline(always)]
-    pub fn re_unit() -> Self {
-        Self::new(1.0, 0.0)
-    }
+    /// Complex constant of 1.0 + i0.0.
+    pub const RE_UNIT: Self = Self::new(1.0_f64, 0.0_f64);
 
-    // Constructor for a complex number with its imaginary part set to 1.0
-    #[inline(always)]
-    pub fn im_unit() -> Self {
-        Self::new(0.0, 1.0)
-    }
+    /// Complex constant of 0.0 + i1.0.
+    pub const IM_UNIT: Self = Self::new(0.0_f64, 1.0_f64);
 
-    /// Constructor for an imaginary unit
-    // This is alias for `Complex64::im_unit()`.
-    #[inline(always)]
-    pub fn i() -> Self {
-        Self::im_unit()
-    }
+    /// Complex constant of 0.0 + i1.0.
+    pub const I: Self = Self::new(0.0_f64, 1.0_f64);
+
+    /// Complex constant of 0.0 + i0.0.
+    pub const ZERO: Self = Self::new(0.0_f64, 0.0_f64);
+
+    /// Complex constant of 1.0 + i0.0.
+    pub const ONE: Self = Self::new(1.0_f64, 0.0_f64);
 
     /// Multiply `self` by the scalar `rhs`
     #[inline(always)]
@@ -913,10 +910,11 @@ mod tests {
     #[test]
     fn sqrt_conjugate() {
         let z = Complex64::new(3.0_f64, 4.0_f64);
-        assert!(z
-            .conj()
-            .sqrt()
-            .approx_eq(z.sqrt().conj(), ULP2_EPS, ULP2_EPS));
+        assert!(
+            z.conj()
+                .sqrt()
+                .approx_eq(z.sqrt().conj(), ULP2_EPS, ULP2_EPS)
+        );
     }
 
     #[test]
@@ -949,20 +947,24 @@ mod tests {
     #[test]
     fn sin() {
         assert!(_0_0i.sin().approx_eq(_0_0i, ULP128_EPS, ULP2_EPS));
-        assert!(_1_0i
-            .scale(std::f64::consts::PI * 2.0_f64)
-            .sin()
-            .approx_eq(_0_0i, ULP128_EPS, ULP2_EPS));
-        assert!(_0_1i
-            .sin()
-            .approx_eq(_0_1i.scale(1.0_f64.sinh()), ULP128_EPS, ULP2_EPS));
+        assert!(
+            _1_0i
+                .scale(std::f64::consts::PI * 2.0_f64)
+                .sin()
+                .approx_eq(_0_0i, ULP128_EPS, ULP2_EPS)
+        );
+        assert!(
+            _0_1i
+                .sin()
+                .approx_eq(_0_1i.scale(1.0_f64.sinh()), ULP128_EPS, ULP2_EPS)
+        );
         for &c in ALL_CONSTS.iter() {
             // sin(conj(z)) = conj(sin(z))
-
-            assert!(c
-                .conj()
-                .sin()
-                .approx_eq(c.sin().conj(), ULP128_EPS, ULP2_EPS));
+            assert!(
+                c.conj()
+                    .sin()
+                    .approx_eq(c.sin().conj(), ULP128_EPS, ULP2_EPS)
+            );
 
             // sin(-z) = -sin(z)
             assert!(c.scale(-1.0_f64).sin().approx_eq(
@@ -976,27 +978,33 @@ mod tests {
     #[test]
     fn cos() {
         assert!(_0_0i.cos().approx_eq(_1_0i, ULP128_EPS, ULP2_EPS));
-        assert!(_1_0i
-            .scale(std::f64::consts::PI * 2.0_f64)
-            .cos()
-            .approx_eq(_1_0i, ULP128_EPS, ULP2_EPS));
+        assert!(
+            _1_0i
+                .scale(std::f64::consts::PI * 2.0_f64)
+                .cos()
+                .approx_eq(_1_0i, ULP128_EPS, ULP2_EPS)
+        );
 
-        assert!(_0_1i
-            .cos()
-            .approx_eq(_1_0i.scale(1.0_f64.cosh()), ULP128_EPS, ULP2_EPS));
+        assert!(
+            _0_1i
+                .cos()
+                .approx_eq(_1_0i.scale(1.0_f64.cosh()), ULP128_EPS, ULP2_EPS)
+        );
 
         for &c in ALL_CONSTS.iter() {
             // cos(conj(z)) = conj(cos(z))
-            assert!(c
-                .conj()
-                .cos()
-                .approx_eq(c.cos().conj(), ULP128_EPS, ULP2_EPS));
+            assert!(
+                c.conj()
+                    .cos()
+                    .approx_eq(c.cos().conj(), ULP128_EPS, ULP2_EPS)
+            );
 
             // cos(-z) = cos(z)
-            assert!(c
-                .scale(-1.0_f64)
-                .cos()
-                .approx_eq(c.cos(), ULP128_EPS, ULP2_EPS));
+            assert!(
+                c.scale(-1.0_f64)
+                    .cos()
+                    .approx_eq(c.cos(), ULP128_EPS, ULP2_EPS)
+            );
         }
     }
 
@@ -1009,19 +1017,19 @@ mod tests {
 
     #[test]
     fn re_unit() {
-        let a = Complex64::re_unit();
+        let a = Complex64::RE_UNIT;
         assert!(a == Complex64::new(1.0_f64, 0.0_f64))
     }
 
     #[test]
     fn im_unit() {
-        let a = Complex64::im_unit();
+        let a = Complex64::IM_UNIT;
         assert!(a == Complex64::new(0.0_f64, 1.0_f64))
     }
 
     #[test]
     fn i_unit() {
-        let a = Complex64::i();
+        let a = Complex64::I;
         assert!(a == Complex64::new(0.0_f64, 1.0_f64))
     }
 
